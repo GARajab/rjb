@@ -1,351 +1,565 @@
-<!DOCTYPE html>
-<html lang="en" manifest="cache.appcache">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>PS4 — Jailbreak</title>
-<style>
-:root{--bg:#070a0f;--panel:#0d1219;--line:#1b2633;--text:#e8edf4;--muted:#778394;--green:#4ade80;--blue:#60a5fa;--yellow:#facc15;--red:#fb7185}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -20%,#172235 0,#070a0f 48%);color:var(--text);font:15px/1.45 "Segoe UI",system-ui,sans-serif}
-body{display:flex;justify-content:center;padding:22px 14px}
-#app{width:min(720px,100%)}
-#brand{text-align:center;margin-bottom:20px}
-#brand img{width:46px;height:46px;border-radius:50%;vertical-align:middle;margin-right:10px;box-shadow:0 0 28px #000}
-#brand b{font-size:18px;letter-spacing:.16em;vertical-align:middle}
-.hero{background:rgba(13,18,25,.92);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 20px 60px #0008}
-#state{font-size:22px;font-weight:700;margin-bottom:5px}
-#det{font-size:13px;color:var(--muted);margin-bottom:18px}
-#det b{color:var(--text)}
-#progress{height:5px;background:#18212c;border-radius:99px;overflow:hidden;margin:0 0 20px}
-#bar{height:100%;width:0;background:var(--green);transition:width .45s ease}
-.stages{display:grid;gap:9px}
-.stage{display:flex;align-items:center;gap:13px;padding:13px 14px;border:1px solid var(--line);background:#0a0f15;border-radius:12px;transition:.25s}
-.stage .num{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#151c25;color:#7f8b9b;font-weight:700;flex:none}
-.stage .copy{min-width:0;flex:1}
-.stage .name{font-weight:650}
-.stage .detail{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stage .status{font-size:12px;color:#657181;white-space:nowrap}
-.stage.active{border-color:#294b6d;background:#0d1722}
-.stage.active .num{background:#183554;color:var(--blue);box-shadow:0 0 18px #3b82f633}
-.stage.active .status{color:var(--blue)}
-.stage.done{border-color:#245438;background:#0a1510}
-.stage.done .num{background:#12351f;color:var(--green)}
-.stage.done .status{color:var(--green)}
-.stage.failed{border-color:#642b38;background:#190d12}
-.stage.failed .num{background:#3b1720;color:var(--red)}
-.stage.failed .status{color:var(--red)}
-#success{display:none;text-align:center;margin-top:16px;padding:18px;border:1px solid #245438;background:#0a1510;border-radius:14px}
-#success.show{display:block}
-#success .check{font-size:36px;color:var(--green)}
-#success b{display:block;font-size:20px;margin-top:4px}
-#out{display:none}
-#cache{font-size:11px;color:#4f5c6c;text-align:center;margin-top:12px;min-height:16px}
-@media(max-width:500px){body{padding:12px 10px}.hero{padding:14px}.stage{padding:11px}.stage .detail{display:none}#state{font-size:19px}}
-</style>
-</head>
-<body>
-<main id="app">
-  <div id="brand"><img src="logo_raw.png" alt=""><b>RAW GAME</b></div>
-  <section class="hero">
-    <div id="state">Detecting firmware...</div>
-    <div id="det">Preparing the process</div>
-    <div id="progress"><div id="bar"></div></div>
 
-    <div class="stages" id="stages">
-      <div class="stage active" data-stage="0"><div class="num">0</div><div class="copy"><div class="name">Firmware check</div><div class="detail">Checking the console environment</div></div><div class="status">RUNNING</div></div>
-      <div class="stage" data-stage="1"><div class="num">1</div><div class="copy"><div class="name">Preparing files</div><div class="detail">Loading required resources</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="2"><div class="num">2</div><div class="copy"><div class="name">Initializing</div><div class="detail">Starting the main process</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="3"><div class="num">3</div><div class="copy"><div class="name">Preparing memory</div><div class="detail">Setting up the runtime</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="4"><div class="num">4</div><div class="copy"><div class="name">System access</div><div class="detail">Continuing the process</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="5"><div class="num">5</div><div class="copy"><div class="name">Final stage</div><div class="detail">Applying the final changes</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="6"><div class="num">6</div><div class="copy"><div class="name">Verification</div><div class="detail">Checking the result</div></div><div class="status">WAITING</div></div>
-      <div class="stage" data-stage="7"><div class="num">7</div><div class="copy"><div class="name">Complete</div><div class="detail">Process finished successfully</div></div><div class="status">WAITING</div></div>
+<!DOCTYPE html>
+
+
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Rajab PS4</title>
+
+<style>
+
+html, body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #05070c;
+    color: #e6ebf2;
+
+    font: 15px/1.45 "Segoe UI", system-ui, sans-serif;
+
+    overflow: hidden;
+}
+
+body {
+    background:
+        linear-gradient(
+            rgba(3, 8, 20, .58),
+            rgba(3, 8, 20, .86)
+        ),
+        url("ps4-background.jpg")
+        center center / cover no-repeat fixed;
+}
+
+/* Main */
+
+#wrap {
+    width: 100%;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+/* Brand */
+
+#brand {
+    position: absolute;
+
+    top: 34px;
+    left: 0;
+    right: 0;
+
+    text-align: center;
+}
+
+#brand b {
+    font-size: 34px;
+
+    font-weight: 700;
+
+    letter-spacing: .14em;
+
+    color: #fff;
+
+    text-shadow:
+        0 2px 15px rgba(0,0,0,.8);
+}
+
+#brandLine {
+    width: 75px;
+    height: 2px;
+
+    margin: 12px auto 0;
+
+    background: rgba(255,255,255,.65);
+}
+
+/* State */
+
+#state {
+    font-size: 24px;
+
+    font-weight: 400;
+
+    margin-bottom: 12px;
+
+    color: #fff;
+
+    text-shadow:
+        0 2px 12px rgba(0,0,0,.9);
+}
+
+#det {
+    font-size: 13px;
+
+    color: #aab3c0;
+
+    margin-bottom: 4px;
+}
+
+#det b {
+    color: #fff;
+    font-weight: 600;
+}
+
+#cache {
+    min-height: 16px;
+
+    font-size: 12px;
+
+    color: #707b89;
+}
+
+#cache.cacheok {
+    color: #82d5a2;
+}
+
+/* Loader */
+
+.loader {
+    width: 42px;
+    height: 42px;
+
+    margin: 18px auto;
+
+    border:
+        3px solid rgba(255,255,255,.17);
+
+    border-top-color:
+        rgba(255,255,255,.95);
+
+    border-radius: 50%;
+
+    animation:
+        spin .8s linear infinite;
+}
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+/* Status */
+
+.ok {
+    color: #82d5a2;
+}
+
+.bad {
+    color: #e98980;
+}
+
+.warn {
+    color: #e6ebf2;
+}
+
+/* Footer */
+
+#footer {
+    position: absolute;
+
+    bottom: 27px;
+
+    left: 0;
+    right: 0;
+
+    text-align: center;
+
+    font-size: 11px;
+
+    letter-spacing: .28em;
+
+    color: rgba(255,255,255,.42);
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="brand">
+
+    <b>Rajab</b>
+
+    <div id="brandLine"></div>
+
+</div>
+
+
+<div id="wrap">
+
+    <div id="state">
+        detecting firmware...
     </div>
 
-    <div id="success"><div class="check">✓</div><b>Process completed successfully</b><span>All stages completed.</span></div>
-    <div id="out"></div>
-  </section>
-  <div id="cache"></div>
-</main>
+    <div class="loader"></div>
+
+    <div id="det"></div>
+
+    <div id="cache"></div>
+
+</div>
+
+
+<div id="footer">
+    PLAYSTATION 4
+</div>
+
 
 <script>
-(function(){
-  const stateEl=document.getElementById('state');
-  const detEl=document.getElementById('det');
-  const outEl=document.getElementById('out');
-  const bar=document.getElementById('bar');
-  const cacheEl=document.getElementById('cache');
-  const successEl=document.getElementById('success');
-  const stageEls=[...document.querySelectorAll('.stage')];
-  const params=new URLSearchParams(location.search);
 
-  function detect(){
-    let key=null,fwnum=null;
-    const m=/PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(navigator.userAgent);
-    if(m){
-      let minor=parseInt(m[2],16).toString(16); if(minor.length<2)minor='0'+minor;
-      key=m[1]+'.'+minor; fwnum=parseInt(m[1],10)*100+parseInt(minor,10);
-    }
-    let bug=null;
-    const forced=params.get('bug');
-    if(forced==='lapse'||forced==='poops') bug=forced;
-    else if(fwnum<=1202) bug='lapse';
-    else if(fwnum>=1250) bug='poops';
-    return {key,fwnum,bug};
-  }
+(function () {
 
-  const info=detect();
-  if(!info.bug){
-    stateEl.textContent='UNSUPPORTED FIRMWARE';
-    stateEl.className='bad';
-    detEl.textContent='Firmware: '+(info.key||'unknown');
-    stageEls[0].classList.add('failed');
-    stageEls[0].classList.remove('active');
-    stageEls[0].querySelector('.status').textContent='FAILED';
-    return;
-  }
+    var stateEl =
+        document.getElementById("state");
 
-  detEl.innerHTML='Firmware <b>'+(info.key||'unknown')+'</b> · mode <b>'+info.bug.toUpperCase()+'</b>';
-let completed = -1;
-let processStarted = false;
-let processFinished = false;
+    var detEl =
+        document.getElementById("det");
 
-function setStage(n, detail) {
-    if (n < 0 || processFinished) return;
+    var cacheEl =
+        document.getElementById("cache");
 
-    completed = Math.max(completed, n);
 
-    for (let i = 0; i < stageEls.length; i++) {
-        const el = stageEls[i];
-        const status = el.querySelector('.status');
+    function setState(t, c) {
 
-        el.classList.remove('active', 'done', 'failed');
+        stateEl.textContent = t;
+        stateEl.className = c || "";
 
-        if (i < n) {
-            el.classList.add('done');
-            status.textContent = 'COMPLETED';
-        } 
-        else if (i === n) {
-            el.classList.add('active');
-            status.textContent = 'RUNNING';
-
-            if (detail) {
-                el.querySelector('.detail').textContent = detail;
-            }
-        } 
-        else {
-            status.textContent = 'WAITING';
-        }
     }
 
-    const pct = Math.min(
-        ((n) / (stageEls.length - 1)) * 100,
-        100
-    );
 
-    bar.style.width = pct + '%';
-}
+    function setCache(t, ok) {
 
-function completeProcess() {
-    if (processFinished) return;
+        cacheEl.textContent = t;
 
-    processFinished = true;
-    completed = stageEls.length - 1;
+        cacheEl.className =
+            ok ? "cacheok" : "";
 
-    stageEls.forEach((el) => {
-        el.classList.remove('active', 'failed');
-        el.classList.add('done');
+    }
 
-        const status = el.querySelector('.status');
-        status.textContent = 'COMPLETED';
-    });
 
-    bar.style.width = '100%';
+    /*
+     * Firmware detection
+     */
 
-    successEl.classList.add('show');
+    var key = null;
+    var fwnum = null;
 
-    stateEl.textContent = 'Completed successfully';
-    stateEl.className = 'ok';
+    var m =
+        /PlayStation\s+4[\/ ]\((\d+)\.(\d+)/i
+        .exec(navigator.userAgent);
+
+
+    if (m) {
+
+        var major =
+            parseInt(m[1], 10);
+
+        var minor =
+            parseInt(m[2], 10);
+
+        key =
+            major + "." +
+            minor.toString().padStart(2, "0");
+
+        fwnum =
+            major * 100 +
+            minor;
+
+    }
+
+
+    /*
+     * Poops ONLY
+     */
+
+    var bug = "poops";
+
 
     detEl.innerHTML =
-        'Firmware <b>' +
-        (info.key || 'unknown') +
-        '</b> · jailbreak completed';
-}
+        "firmware <b>" +
+        (key || "unknown") +
+        "</b> &middot; bug <b>poops</b>";
 
-/*
- * لا نعتبر ERROR / THREW / TIMEOUT فشلًا.
- *
- * هذه الرسائل قد تكون جزءًا من محاولات داخلية
- * للـ chain، ولا تعني أن العملية النهائية فشلت.
- */
-function inspect() {
-    const text = outEl.textContent || '';
-
-    if (!text || processFinished) return;
-
-    const has = (x) => text.includes(x);
-
-    if (has('KPATCH-BLOB') || has('PAYLOAD-BLOB')) {
-        setStage(1, 'Required resources loaded');
-    }
-
-    if (has('PRIMITIVE-OK')) {
-        setStage(2, 'Main process initialized');
-    }
-
-    if (has('BASES') || has('PAIR-STATUS')) {
-        setStage(3, 'Runtime prepared');
-    }
-
-    if (has('IOV-SS') || has('GADGET') || has('STUBS')) {
-        setStage(4, 'System stage in progress');
-    }
-
-    if (
-        has('KREAD-BEGIN') ||
-        has('make_karw') ||
-        has('KREAD')
-    ) {
-        setStage(5, 'Final stage in progress');
-    }
-
-    if (
-        has('KWRITE-BEGIN') ||
-        has('COMMITTED') ||
-        has('PATCH')
-    ) {
-        setStage(6, 'Verifying result');
-    }
 
     /*
-     * النجاح النهائي فقط.
-     *
-     * لا يوجد هنا:
-     * ERROR
-     * THREW
-     * TIMEOUT
-     *
-     * لأن هذه الكلمات لا تعني بالضرورة فشل الـ jailbreak.
+     * Always use the existing
+     * run_poops.html file.
      */
-    if (
-        /\bSUCCESS\b/i.test(text) ||
-        /\bACHIEVED\b/i.test(text) ||
-        /\bJAILBREAK[- ]SUCCESS\b/i.test(text) ||
-        /\bKERNEL[- ]PATCHED\b/i.test(text)
-    ) {
-        completeProcess();
-    }
-}
 
-const observer = new MutationObserver(inspect);
-
-observer.observe(outEl, {
-    childList: true,
-    subtree: true,
-    characterData: true
-});
+    var target =
+        "run_poops.html" +
+        location.search;
 
 
-const ac = window.applicationCache;
+    function go() {
 
-if (ac) {
-
-    ac.addEventListener(
-        'downloading',
-        () => {
-            cacheEl.textContent =
-                'Preparing offline cache...';
-        }
-    );
-
-    ac.addEventListener(
-        'cached',
-        () => {
-            cacheEl.textContent =
-                'Offline cache ready';
-        }
-    );
-
-    ac.addEventListener(
-        'updateready',
-        () => {
-            try {
-                ac.swapCache();
-            } catch (e) {}
-
-            cacheEl.textContent =
-                'Cache updated';
-        }
-    );
-
-    ac.addEventListener(
-        'noupdate',
-        () => {
-            cacheEl.textContent = '';
-        }
-    );
-
-    ac.addEventListener(
-        'error',
-        () => {
-            cacheEl.textContent = '';
-        }
-    );
-}
-
-
-setStage(
-    0,
-    'Firmware ' + (info.key || 'unknown') + ' detected'
-);
-
-stateEl.textContent =
-    'Starting ' + info.bug + ' chain...';
-
-processStarted = true;
-
-
-import(
-    info.bug === 'poops'
-        ? './chain_poops.js'
-        : './chain_lapse.js'
-)
-.catch(function(e) {
-
-    /*
-     * فشل تحميل الملف نفسه فقط يعتبر خطأ.
-     *
-     * لا نضع Stage 7 FAILED بسبب log.
-     */
-    const current =
-        Math.min(
-            Math.max(completed + 1, 0),
-            stageEls.length - 1
+        setState(
+            "loading poops...",
+            "warn"
         );
 
-    const el = stageEls[current];
+        location.replace(target);
 
-    if (el) {
-        el.classList.remove('active');
-        el.classList.add('failed');
-
-        el.querySelector('.status').textContent =
-            'FAILED';
-
-        el.querySelector('.detail').textContent =
-            'Unable to load the process';
     }
 
-    stateEl.textContent =
-        'Unable to start the process';
 
-    detEl.textContent =
-        'Module error: ' + e.message;
-});
-  
+    /*
+     * Application Cache
+     */
+
+    var ac =
+        window.applicationCache;
+
+
+    /*
+     * No X button.
+     * No click handler.
+     * No waitForTap().
+     */
+
+    if (
+        !ac ||
+        !document.documentElement
+            .hasAttribute("manifest")
+    ) {
+
+        go();
+
+    }
+
+    else if (!navigator.onLine) {
+
+        setCache(
+            "offline -- from cache",
+            true
+        );
+
+        go();
+
+    }
+
+    else if (
+        ac.status === ac.IDLE
+    ) {
+
+        setCache(
+            "cached",
+            true
+        );
+
+        go();
+
+    }
+
+    else if (
+        ac.status === ac.UPDATEREADY
+    ) {
+
+        try {
+            ac.swapCache();
+        }
+
+        catch (e) {}
+
+        setCache(
+            "update downloaded",
+            true
+        );
+
+        /*
+         * Reload immediately.
+         */
+
+        location.reload();
+
+    }
+
+    else {
+
+        setCache(
+            "checking cache..."
+        );
+
+
+        ac.addEventListener(
+            "downloading",
+
+            function () {
+
+                setCache(
+                    "caching for offline..."
+                );
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "progress",
+
+            function (e) {
+
+                if (
+                    e &&
+                    e.total
+                ) {
+
+                    setCache(
+                        "caching " +
+                        Math.round(
+                            (e.loaded /
+                             e.total) * 100
+                        ) +
+                        "%"
+                    );
+
+                }
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "cached",
+
+            function () {
+
+                setCache(
+                    "cached for offline use",
+                    true
+                );
+
+                /*
+                 * Start automatically.
+                 */
+
+                go();
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "updateready",
+
+            function () {
+
+                try {
+                    ac.swapCache();
+                }
+
+                catch (e) {}
+
+                setCache(
+                    "update downloaded",
+                    true
+                );
+
+                /*
+                 * No X.
+                 * Reload immediately.
+                 */
+
+                location.reload();
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "noupdate",
+
+            function () {
+
+                setCache(
+                    "cached -- offline ready",
+                    true
+                );
+
+                go();
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "error",
+
+            function () {
+
+                setCache(
+                    "cache unavailable"
+                );
+
+                /*
+                 * Run existing target
+                 * without waiting for X.
+                 */
+
+                go();
+
+            },
+
+            false
+        );
+
+
+        ac.addEventListener(
+            "obsolete",
+
+            function () {
+
+                setCache(
+                    "cache obsolete"
+                );
+
+                go();
+
+            },
+
+            false
+        );
+
+    }
+
+
 })();
+
 </script>
+
 </body>
+
 </html>
+
