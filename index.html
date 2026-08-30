@@ -107,71 +107,244 @@ body{display:flex;justify-content:center;padding:22px 14px}
   }
 
   detEl.innerHTML='Firmware <b>'+(info.key||'unknown')+'</b> · mode <b>'+info.bug.toUpperCase()+'</b>';
+let completed = -1;
+let processStarted = false;
+let processFinished = false;
 
-  let completed=-1;
-  function setStage(n,detail){
-    if(n<0)return;
-    for(let i=0;i<stageEls.length;i++){
-      const el=stageEls[i],status=el.querySelector('.status');
-      el.classList.remove('active','done');
-      if(i<=n){el.classList.add('done');status.textContent='COMPLETED';}
-      else if(i===n+1){el.classList.add('active');status.textContent='RUNNING';}
-      else status.textContent='WAITING';
-      if(i===n && detail)el.querySelector('.detail').textContent=detail;
+function setStage(n, detail) {
+    if (n < 0 || processFinished) return;
+
+    completed = Math.max(completed, n);
+
+    for (let i = 0; i < stageEls.length; i++) {
+        const el = stageEls[i];
+        const status = el.querySelector('.status');
+
+        el.classList.remove('active', 'done', 'failed');
+
+        if (i < n) {
+            el.classList.add('done');
+            status.textContent = 'COMPLETED';
+        } 
+        else if (i === n) {
+            el.classList.add('active');
+            status.textContent = 'RUNNING';
+
+            if (detail) {
+                el.querySelector('.detail').textContent = detail;
+            }
+        } 
+        else {
+            status.textContent = 'WAITING';
+        }
     }
-    completed=Math.max(completed,n);
-    const pct=((completed+1)/stageEls.length)*100;
-    bar.style.width=pct+'%';
-  }
-  function failStage(n,msg){
-    const el=stageEls[n]; if(!el)return;
-    el.classList.remove('active','done');el.classList.add('failed');
-    el.querySelector('.status').textContent='FAILED';
-    if(msg)el.querySelector('.detail').textContent=msg;
-    stateEl.textContent='Process stopped';
-  }
 
-  function inspect(){
-    const text=outEl.textContent||'';
-    if(!text)return;
-    const has=x=>text.includes(x);
-    if(has('KPATCH-BLOB')||has('PAYLOAD-BLOB'))setStage(1,'Required resources loaded');
-    if(has('PRIMITIVE-OK'))setStage(2,'Main process initialized');
-    if(has('BASES')||has('PAIR-STATUS'))setStage(3,'Runtime prepared');
-    if(has('IOV-SS')||has('GADGET')||has('STUBS'))setStage(4,'System stage in progress');
-    if(has('KREAD-BEGIN')||has('make_karw')||has('KREAD'))setStage(5,'Final stage in progress');
-    if(has('KWRITE-BEGIN')||has('COMMITTED')||has('PATCH'))setStage(6,'Verifying result');
-    if(/\bSUCCESS\b|\bCOMPLETED\b|\bDONE\b|\bACHIEVED\b/i.test(text)){
-      setStage(7,'All stages completed');
-      successEl.classList.add('show');
-      stateEl.textContent='Completed successfully';
-      stateEl.className='ok';
+    const pct = Math.min(
+        ((n) / (stageEls.length - 1)) * 100,
+        100
+    );
+
+    bar.style.width = pct + '%';
+}
+
+function completeProcess() {
+    if (processFinished) return;
+
+    processFinished = true;
+    completed = stageEls.length - 1;
+
+    stageEls.forEach((el) => {
+        el.classList.remove('active', 'failed');
+        el.classList.add('done');
+
+        const status = el.querySelector('.status');
+        status.textContent = 'COMPLETED';
+    });
+
+    bar.style.width = '100%';
+
+    successEl.classList.add('show');
+
+    stateEl.textContent = 'Completed successfully';
+    stateEl.className = 'ok';
+
+    detEl.innerHTML =
+        'Firmware <b>' +
+        (info.key || 'unknown') +
+        '</b> · jailbreak completed';
+}
+
+/*
+ * لا نعتبر ERROR / THREW / TIMEOUT فشلًا.
+ *
+ * هذه الرسائل قد تكون جزءًا من محاولات داخلية
+ * للـ chain، ولا تعني أن العملية النهائية فشلت.
+ */
+function inspect() {
+    const text = outEl.textContent || '';
+
+    if (!text || processFinished) return;
+
+    const has = (x) => text.includes(x);
+
+    if (has('KPATCH-BLOB') || has('PAYLOAD-BLOB')) {
+        setStage(1, 'Required resources loaded');
     }
-    if(/PROOF-FAIL|ERROR|THREW|ABORTED|TIMEOUT/i.test(text) && !successEl.classList.contains('show')){
-      const n=Math.min(Math.max(completed+1,0),stageEls.length-1);
-      failStage(n,'An error occurred — check the log');
+
+    if (has('PRIMITIVE-OK')) {
+        setStage(2, 'Main process initialized');
     }
-  }
 
-  const observer=new MutationObserver(inspect);
-  observer.observe(outEl,{childList:true,subtree:true,characterData:true});
+    if (has('BASES') || has('PAIR-STATUS')) {
+        setStage(3, 'Runtime prepared');
+    }
 
-  const ac=window.applicationCache;
-  if(ac){
-    ac.addEventListener('downloading',()=>cacheEl.textContent='Preparing offline cache...');
-    ac.addEventListener('cached',()=>cacheEl.textContent='Offline cache ready');
-    ac.addEventListener('updateready',()=>{try{ac.swapCache()}catch(e){};cacheEl.textContent='Cache updated';});
-    ac.addEventListener('noupdate',()=>cacheEl.textContent='');
-    ac.addEventListener('error',()=>cacheEl.textContent='');
-  }
+    if (has('IOV-SS') || has('GADGET') || has('STUBS')) {
+        setStage(4, 'System stage in progress');
+    }
 
-  setStage(0,'Firmware '+(info.key||'unknown')+' detected');
-  stateEl.textContent='Starting '+info.bug+' chain...';
+    if (
+        has('KREAD-BEGIN') ||
+        has('make_karw') ||
+        has('KREAD')
+    ) {
+        setStage(5, 'Final stage in progress');
+    }
 
-  import(info.bug==='poops'?'./chain_poops.js':'./chain_lapse.js').catch(function(e){
-    failStage(Math.min(completed+1,stageEls.length-1),'Unable to load the process');
-    detEl.textContent='Module error: '+e.message;
-  });
+    if (
+        has('KWRITE-BEGIN') ||
+        has('COMMITTED') ||
+        has('PATCH')
+    ) {
+        setStage(6, 'Verifying result');
+    }
+
+    /*
+     * النجاح النهائي فقط.
+     *
+     * لا يوجد هنا:
+     * ERROR
+     * THREW
+     * TIMEOUT
+     *
+     * لأن هذه الكلمات لا تعني بالضرورة فشل الـ jailbreak.
+     */
+    if (
+        /\bSUCCESS\b/i.test(text) ||
+        /\bACHIEVED\b/i.test(text) ||
+        /\bJAILBREAK[- ]SUCCESS\b/i.test(text) ||
+        /\bKERNEL[- ]PATCHED\b/i.test(text)
+    ) {
+        completeProcess();
+    }
+}
+
+const observer = new MutationObserver(inspect);
+
+observer.observe(outEl, {
+    childList: true,
+    subtree: true,
+    characterData: true
+});
+
+
+const ac = window.applicationCache;
+
+if (ac) {
+
+    ac.addEventListener(
+        'downloading',
+        () => {
+            cacheEl.textContent =
+                'Preparing offline cache...';
+        }
+    );
+
+    ac.addEventListener(
+        'cached',
+        () => {
+            cacheEl.textContent =
+                'Offline cache ready';
+        }
+    );
+
+    ac.addEventListener(
+        'updateready',
+        () => {
+            try {
+                ac.swapCache();
+            } catch (e) {}
+
+            cacheEl.textContent =
+                'Cache updated';
+        }
+    );
+
+    ac.addEventListener(
+        'noupdate',
+        () => {
+            cacheEl.textContent = '';
+        }
+    );
+
+    ac.addEventListener(
+        'error',
+        () => {
+            cacheEl.textContent = '';
+        }
+    );
+}
+
+
+setStage(
+    0,
+    'Firmware ' + (info.key || 'unknown') + ' detected'
+);
+
+stateEl.textContent =
+    'Starting ' + info.bug + ' chain...';
+
+processStarted = true;
+
+
+import(
+    info.bug === 'poops'
+        ? './chain_poops.js'
+        : './chain_lapse.js'
+)
+.catch(function(e) {
+
+    /*
+     * فشل تحميل الملف نفسه فقط يعتبر خطأ.
+     *
+     * لا نضع Stage 7 FAILED بسبب log.
+     */
+    const current =
+        Math.min(
+            Math.max(completed + 1, 0),
+            stageEls.length - 1
+        );
+
+    const el = stageEls[current];
+
+    if (el) {
+        el.classList.remove('active');
+        el.classList.add('failed');
+
+        el.querySelector('.status').textContent =
+            'FAILED';
+
+        el.querySelector('.detail').textContent =
+            'Unable to load the process';
+    }
+
+    stateEl.textContent =
+        'Unable to start the process';
+
+    detEl.textContent =
+        'Module error: ' + e.message;
+});
+  
 })();
 </script>
 </body>
